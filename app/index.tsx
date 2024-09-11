@@ -1,6 +1,6 @@
 import { Score } from "@/features/game/components/score";
 import { useEffect, useState } from "react";
-import { View, Text, Alert } from "react-native";
+import { View, Text, Alert, Pressable } from "react-native";
 
 const numberOfSet = 3;
 const points2Win = 11;
@@ -11,11 +11,17 @@ export default function Game() {
   const [player1, setPlayer1] = useState({
     name: "Player 1",
     scoresPerSet: Array.from<number>({ length: numberOfSet }).fill(0),
+    setWin: 0,
   });
   const [player2, setPlayer2] = useState({
     name: "Player 2",
     scoresPerSet: Array.from<number>({ length: numberOfSet }).fill(0),
+    setWin: 0,
   });
+
+  let gameOver =
+    player1.setWin === Math.ceil(numberOfSet / 2) ||
+    player2.setWin === Math.ceil(numberOfSet / 2);
 
   const moveToNextSet = () => {
     setCurrentSet((prev) => {
@@ -27,42 +33,64 @@ export default function Game() {
   };
 
   useEffect(() => {
+    if (gameOver) {
+      const winner =
+        player1.setWin === Math.ceil(numberOfSet / 2) ? player1 : player2;
+      Alert.alert("Match ends", `${winner.name} wins the game!`, [
+        { text: "Reset", onPress: reset },
+      ]);
+      return;
+    }
+
     const p1Score = player1.scoresPerSet[currentSet];
     const p2Score = player2.scoresPerSet[currentSet];
 
     if (p1Score >= points2Win && p1Score - p2Score >= ptsDiff) {
-      Alert.alert("Winner", `${player1.name} wins set ${currentSet + 1}!`, [
-        {
-          text: "Ok",
-          onPress: moveToNextSet,
-        },
-      ]);
+      return Alert.alert(
+        "Winner",
+        `${player1.name} wins set ${currentSet + 1}!`,
+        [
+          {
+            text: "Ok",
+            onPress: () => {
+              moveToNextSet();
+              setPlayer1((prev) => ({ ...prev, setWin: prev.setWin + 1 }));
+            },
+          },
+        ]
+      );
     }
 
     if (p2Score >= points2Win && p2Score - p1Score >= ptsDiff) {
-      Alert.alert("Winner", `${player2.name} wins set ${currentSet + 1}!`, [
-        {
-          text: "Ok",
-          onPress: moveToNextSet,
-        },
-      ]);
+      return Alert.alert(
+        "Winner",
+        `${player2.name} wins set ${currentSet + 1}!`,
+        [
+          {
+            text: "Ok",
+            onPress: () => {
+              moveToNextSet();
+              setPlayer2((prev) => ({ ...prev, setWin: prev.setWin + 1 }));
+            },
+          },
+        ]
+      );
     }
-  }, [player1, player2, currentSet]);
+  }, [player1, player2, currentSet, gameOver]);
 
-  let p1SetWin = 0;
-  let p2SetWin = 0;
-
-  for (let i = 0; i < player1.scoresPerSet.length; i++) {
-    const p1Score = player1.scoresPerSet.at(i)!;
-    const p2Score = player2.scoresPerSet.at(i)!;
-
-    if (p1Score >= points2Win && p1Score - p2Score >= ptsDiff) {
-      p1SetWin += 1;
-    }
-    if (p2Score >= points2Win && p2Score - p1Score >= ptsDiff) {
-      p2SetWin += 1;
-    }
-  }
+  const reset = () => {
+    setCurrentSet(0);
+    setPlayer1((prev) => ({
+      ...prev,
+      scoresPerSet: Array.from<number>({ length: numberOfSet }).fill(0),
+      setWin: 0,
+    }));
+    setPlayer2((prev) => ({
+      ...prev,
+      scoresPerSet: Array.from<number>({ length: numberOfSet }).fill(0),
+      setWin: 0,
+    }));
+  };
 
   return (
     <View className="flex h-screen w-screen flex-row justify-center items-center transition-colors dark:bg-gray-900">
@@ -95,12 +123,19 @@ export default function Game() {
         </View>
         <View className="flex-row w-48 h-20 bg-white rounded-lg self-center">
           <Text className="flex-1 text-center align-middle text-7xl leading-[1.2] font-mono font-bold text-teal-500">
-            {p1SetWin}
+            {player1.setWin}
           </Text>
           <Text className="flex-1 text-center align-middle text-7xl leading-[1.2] font-mono font-bold text-amber-500">
-            {p2SetWin}
+            {player2.setWin}
           </Text>
         </View>
+
+        <Pressable
+          onPress={reset}
+          className="w-20 h-10 items-center justify-center active:opacity-50 bg-white rounded-full"
+        >
+          <Text className="text-xl leading-normal">Reset</Text>
+        </Pressable>
 
         <View className="flex-[1.2]" />
       </View>
