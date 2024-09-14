@@ -7,7 +7,7 @@ import {
   resetGame,
 } from "@/features/game/game.atoms";
 import { useAtom, useAtomValue } from "jotai";
-import { Pressable, View } from "react-native";
+import { Alert, Pressable, View } from "react-native";
 import { Text } from "@/components/AnimatedText";
 
 export default function Game() {
@@ -68,6 +68,19 @@ const Player = ({
           }
           return { ...v };
         });
+      }}
+      nameTap={() => {
+        Alert.prompt("Rename", `Change ${player.name} to?`, [
+          { text: "Cancel", isPreferred: true },
+          {
+            text: "Next",
+            onPress: (newName) => {
+              if (newName) {
+                setPlayer((prev) => ({ ...prev, name: newName }));
+              }
+            },
+          },
+        ]);
       }}
     />
   );

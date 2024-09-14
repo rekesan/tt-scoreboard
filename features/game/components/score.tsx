@@ -14,17 +14,24 @@ export const Score = ({
   className,
   add,
   subtract,
+  longPress,
+  nameTap,
 }: {
   className?: string;
   playerName: string;
   score?: number;
   add?: (...args: any) => any;
   subtract?: (...args: any) => any;
+  longPress?: (...args: any) => any;
+  nameTap?: (...args: any) => any;
 }) => {
   const gestures = Gesture.Exclusive(
     Gesture.LongPress()
       .minDuration(1000)
       .onStart((e) => {
+        if (longPress) {
+          runOnJS(longPress)(e);
+        }
         console.log("long press");
       }),
     Gesture.Fling()
@@ -43,12 +50,20 @@ export const Score = ({
     })
   );
 
+  const gestureInner = Gesture.Tap().onStart((e) => {
+    if (nameTap) {
+      runOnJS(nameTap)(e);
+    }
+  });
+
   return (
     <GestureDetector gesture={gestures}>
       <View className={`justify-center items-center ${className}`}>
-        <Text className="text-5xl text-white font-mono font-bold text-center">
-          {playerName}
-        </Text>
+        <GestureDetector gesture={gestureInner}>
+          <Text className="text-5xl text-white font-mono font-bold text-center">
+            {playerName}
+          </Text>
+        </GestureDetector>
         <Text className="text-[18rem] text-white font-mono font-bold">
           {score}
         </Text>
