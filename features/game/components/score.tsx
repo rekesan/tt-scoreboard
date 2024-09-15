@@ -60,11 +60,19 @@ export const Score = ({
     <GestureDetector gesture={gestures}>
       <View className={`justify-center items-center ${className}`}>
         <GestureDetector gesture={gestureInner}>
-          <Text className="text-5xl text-white font-mono font-bold text-center">
+          <Text
+            className="max-h-20 text-[6rem] w-11/12 text-white font-mono font-bold text-center active:"
+            minimumFontScale={0.5}
+            adjustsFontSizeToFit
+          >
             {playerName}
           </Text>
         </GestureDetector>
-        <Text className="text-[18rem] text-white font-mono font-bold">
+        <Text
+          className="h-96 text-[25rem] w-11/12 text-white font-mono font-bold text-center"
+          minimumFontScale={0.5}
+          adjustsFontSizeToFit
+        >
           {score}
         </Text>
       </View>
