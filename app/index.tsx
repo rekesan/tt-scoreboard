@@ -70,17 +70,17 @@ const Player = ({
         });
       }}
       nameTap={() => {
-        Alert.prompt("Rename", `Change ${player.name} to?`, [
-          { text: "Cancel", isPreferred: true },
-          {
-            text: "Next",
-            onPress: (newName) => {
-              if (newName) {
-                setPlayer((prev) => ({ ...prev, name: newName }));
-              }
-            },
+        Alert.prompt(
+          "Rename",
+          `Change ${player.name} to?`,
+          (newName) => {
+            if (newName) {
+              setPlayer((prev) => ({ ...prev, name: newName }));
+            }
           },
-        ]);
+          undefined,
+          player.name
+        );
       }}
     />
   );
